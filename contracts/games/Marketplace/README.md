@@ -56,7 +56,7 @@ onlyPrivileges: Requires that the method caller is an Admin or Super Admin.
 
 ### sellToken
 
-List an NFT for sale by specifying its contract address, token ID, amount, price, and whether the price is denominated in USD or GFAL tokens. Requires the token to be in a whitelisted collection and owned by the Marketplace contract. When selling ERC1155 tokens, the seller can only sell a batch of the same token Id until it is sold or removed.
+List an NFT for sale by specifying its contract address, token ID, amount, price, and whether the price is denominated in USD or GFAL tokens. Requires the token to be in a whitelisted collection and owned by the Marketplace contract.
 
 ### buyToken
 
