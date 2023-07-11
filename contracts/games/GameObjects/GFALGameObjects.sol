@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "../../utils/OracleConsumer/IOracleConsumer.sol";
-import "../../utils/GFALProxy/IGFALProxy.sol";
+import "../../utils/OracleConsumer/IGFALOracleConsumer.sol";
+import "../../utils/Proxy/IGFALProxy.sol";
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   @@@@@@@@%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -25,13 +25,14 @@ import "../../utils/GFALProxy/IGFALProxy.sol";
                                                         GFAL - GAMES FOR A LIVING
 */
 /**
- * @title Items
- * @dev This contract represents an ERC721 token for Elemental Raiders Heroes game. It uses SafeERC20 to transfer GFAL tokens and OracleConsumer to fetch GFAL price conversion rates.
+ * @title GFAL Game Objects
+ * @dev This contract represents an ERC721 token for GFAL (Games for a living) game Items. It uses SafeERC20 to transfer GFAL tokens and OracleConsumer to fetch GFAL price conversion rates.
  * The contract allows the game to safely mint tokens by ensuring that users have approved the required amount of GFAL tokens before minting & allowes the Marketplace SC to manage all NFTs.
  * The contract also allows the game owner to update minting prices and the base URI.
  * Note: Constructor and functions that need gas fee are set as payable to avoid OPCODES checking msg.value.
  */
-contract Items is ERC721, ERC721Enumerable, ERC721Burnable {
+
+contract GFALGameObjects is ERC721, ERC721Enumerable, ERC721Burnable {
     using SafeERC20 for IERC20;
 
     struct Collection {
@@ -44,7 +45,7 @@ contract Items is ERC721, ERC721Enumerable, ERC721Burnable {
     uint16 private royaltyFraction; // Royalty percentage to send to feeCollector when sold in secondary market, but not in our marketplace. (royaltyFraction / 10.000)
     string private baseURI;
     uint256 private _tokenIdCounter; // Counter for the total number of tokens minted.
-    uint256 public collectionCounter; // Counter for the total number of Heroes Collections created.
+    uint256 public collectionCounter; // Counter for the total number of Items Collections created.
 
     mapping(uint256 => Collection) public collectionSupply; // Tracking for Collections.
 
@@ -68,7 +69,7 @@ contract Items is ERC721, ERC721Enumerable, ERC721Burnable {
     }
 
     /**
-     * @dev Initializes the Elemental Raiders Heroes contract by setting the GFAL proxy address, the base URI and royalty Fraction.
+     * @dev Initializes the Items contract by setting the GFAL proxy address, the base URI and royalty Fraction.
      * @param _gfalProxy The GFALProxy contract address.
      * @param _baseUri The base URI for the token metadata.
      * @param _royaltyFraction The Royalty percentage
@@ -77,7 +78,7 @@ contract Items is ERC721, ERC721Enumerable, ERC721Burnable {
         address _gfalProxy,
         string memory _baseUri,
         uint16 _royaltyFraction
-    ) payable ERC721("Elemental Raiders Heroes", "ERSKIN") {
+    ) payable ERC721("Elemental Raiders Heroes", "ERHEROES") {
         require(_gfalProxy != address(0), "Address cannot be 0");
         gfalProxy = IGFALProxy(_gfalProxy);
         baseURI = _baseUri;
@@ -124,7 +125,7 @@ contract Items is ERC721, ERC721Enumerable, ERC721Burnable {
         }
 
         // Get the conversion from USD to GFAL
-        uint256 tokenPrice = IOracleConsumer(gfalProxy.getOracleConsumer())
+        uint256 tokenPrice = IGFALOracleConsumer(gfalProxy.getOracleConsumer())
             .getConversionRate(price);
         // Transferring $GFAL fee from player wallet to feeCollector. Assuming previous allowance has been given.
         IERC20(gfalProxy.getGfalToken()).safeTransferFrom(

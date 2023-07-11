@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "../GFALProxy/IGFALProxy.sol";
+import "../Proxy/IGFALProxy.sol";
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   @@@@@@@@%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -19,11 +19,11 @@ import "../GFALProxy/IGFALProxy.sol";
                                                         GFAL - GAMES FOR A LIVING
 */
 /**
- * @title OracleConsumer
+ * @title GFALOracleConsumer
  * @dev This contract allows the exchange of USD to GFAL tokens using a conversion rate.
  * Note: Constructor and functions that need gas fee are set as payable to avoid OPCODES checking msg.value.
  */
-contract OracleConsumer {
+contract GFALOracleConsumer {
     // Address of the GFALProxy contract
     IGFALProxy private immutable gfalProxy;
     // The value of 1 USD in wei (18 decimal places)

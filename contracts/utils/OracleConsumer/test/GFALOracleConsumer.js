@@ -28,7 +28,9 @@ describe("OracleConsumer", function () {
     //Note: Admin will be removed after the massive deployment is finished and everything is set up for production.
     await proxy.connect(owner).updateSuperAdmin(admin.address, false);
 
-    const OracleConsumer = await ethers.getContractFactory("OracleConsumer");
+    const OracleConsumer = await ethers.getContractFactory(
+      "GFALOracleConsumer"
+    );
     const oracleConsumer = await OracleConsumer.deploy(
       proxy.address,
       ethers.utils.parseUnits("0.1", "ether")

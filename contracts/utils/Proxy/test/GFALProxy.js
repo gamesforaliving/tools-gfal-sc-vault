@@ -42,7 +42,9 @@ describe("GFALProxy", function () {
     await proxy.deployed();
 
     // ORACLE CONSUMER
-    const OracleConsumer = await ethers.getContractFactory("OracleConsumer");
+    const OracleConsumer = await ethers.getContractFactory(
+      "GFALOracleConsumer"
+    );
     const oracleConsumer = await OracleConsumer.deploy(
       proxy.address,
       ethers.utils.parseUnits("0.1", "ether")
@@ -150,15 +152,9 @@ describe("GFALProxy", function () {
     });
 
     it("Should update Admin and refuse if caller is not owner", async () => {
-      const {
-        owner,
-        user,
-        admin,
-        contract,
-        proxy,
-        gFALMarketplace,
-        superAdmin,
-      } = await loadFixture(deployContracts);
+      const { owner, user, admin, proxy, superAdmin } = await loadFixture(
+        deployContracts
+      );
 
       await expect(proxy.connect(admin).updateAdmin(user.address, true)).to.be
         .reverted;
@@ -171,15 +167,7 @@ describe("GFALProxy", function () {
     });
 
     it("Should return false if not superAdmin", async () => {
-      const {
-        owner,
-        user,
-        admin,
-        contract,
-        proxy,
-        gFALMarketplace,
-        superAdmin,
-      } = await loadFixture(deployContracts);
+      const { user, admin, proxy } = await loadFixture(deployContracts);
 
       await expect(proxy.connect(admin).updateSuperAdmin(user.address, true)).to
         .be.reverted;

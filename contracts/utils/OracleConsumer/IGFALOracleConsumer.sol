@@ -16,7 +16,7 @@ pragma solidity 0.8.19;
   @@@@@@@@#########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                                                         GFAL - GAMES FOR A LIVING
 */
-interface IOracleConsumer {
+interface IGFALOracleConsumer {
     function getConversionRate(uint256 value) external view returns (uint256);
 
     function updateRateValue(uint256 _lastTokenRateValue) external;

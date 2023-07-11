@@ -1,4 +1,4 @@
-# Items
+# GFAL Game Objects
 
 This smart contract represents an ERC721 token for the GFAL games. The contract allows the game to mint tokens safely by ensuring that users have approved the required amount of GFAL tokens before minting, and allows the Marketplace smart contract to manage all NFTs.
 

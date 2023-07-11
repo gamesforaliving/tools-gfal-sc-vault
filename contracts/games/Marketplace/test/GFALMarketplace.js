@@ -41,28 +41,30 @@ describe("GFALMarketplace", function () {
       superAdmin.address
     );
     await proxy.deployed();
-    const OracleConsumer = await ethers.getContractFactory("OracleConsumer");
+    const OracleConsumer = await ethers.getContractFactory(
+      "GFALOracleConsumer"
+    );
     const oracleConsumer = await OracleConsumer.deploy(
       proxy.address,
       ethers.utils.parseUnits("0.1", "ether")
     );
     await oracleConsumer.deployed();
 
-    const Items1 = await ethers.getContractFactory("Items");
-    const items1 = await Items1.deploy(
+    const Objects1 = await ethers.getContractFactory("GFALGameObjects");
+    const objects1 = await Objects1.deploy(
       proxy.address,
       "ipfs://",
       ROYALTIES_IN_BASIS_POINTS
     );
-    await items1.deployed();
+    await objects1.deployed();
 
-    const Items2 = await ethers.getContractFactory("Items");
-    const items2 = await Items2.deploy(
+    const Objects2 = await ethers.getContractFactory("GFALGameObjects");
+    const objects2 = await Objects2.deploy(
       proxy.address,
       "ipfs://",
       ROYALTIES_IN_BASIS_POINTS
     );
-    await items1.deployed();
+    await objects1.deployed();
 
     // Mock up for testing a simple ERC1155 standar.
     const Erc1155MockUp = await ethers.getContractFactory("Erc1155MockUp");
@@ -76,10 +78,10 @@ describe("GFALMarketplace", function () {
     // Massive approvals of GFAL token for ERC721s when minting (ONE LIFE TIME)
     await gfalToken
       .connect(seller)
-      .approve(items1.address, UNLIMITED_GFAL_APPROVAL);
+      .approve(objects1.address, UNLIMITED_GFAL_APPROVAL);
     await gfalToken
       .connect(seller)
-      .approve(items2.address, UNLIMITED_GFAL_APPROVAL);
+      .approve(objects2.address, UNLIMITED_GFAL_APPROVAL);
 
     // Transferring $GFAL tokens to seller and buyer
     await gfalToken.transfer(
@@ -110,10 +112,10 @@ describe("GFALMarketplace", function () {
     // Whitelist Items1 by owner
     await gfalMarketplace
       .connect(admin)
-      .updateCollection(items1.address, ERC721, true);
+      .updateCollection(objects1.address, ERC721, true);
     await gfalMarketplace
       .connect(admin)
-      .updateCollection(items2.address, ERC721, true);
+      .updateCollection(objects2.address, ERC721, true);
     await gfalMarketplace
       .connect(admin)
       .updateCollection(erc1155MockUp.address, ERC1155, true);
@@ -124,20 +126,20 @@ describe("GFALMarketplace", function () {
       .updateOracleConsumer(oracleConsumer.address);
     await proxy.connect(superAdmin).updateMarketPlace(gfalMarketplace.address);
 
-    await items1.connect(admin).createCollection(100);
+    await objects1.connect(admin).createCollection(100);
 
-    await items1.connect(admin).safeMint(seller.address, 1, 0);
-    await items1.connect(admin).safeMint(seller.address, 1, 0);
+    await objects1.connect(admin).safeMint(seller.address, 1, 0);
+    await objects1.connect(admin).safeMint(seller.address, 1, 0);
 
     // Heroes
     await gfalToken
       .connect(seller)
-      .approve(items2.address, ethers.utils.parseUnits("1000", "ether"));
+      .approve(objects2.address, ethers.utils.parseUnits("1000", "ether"));
 
-    await items2.connect(admin).createCollection(100);
+    await objects2.connect(admin).createCollection(100);
 
-    await items2.connect(admin).safeMint(seller.address, 1, 0);
-    await items2.connect(admin).safeMint(seller.address, 1, 0);
+    await objects2.connect(admin).safeMint(seller.address, 1, 0);
+    await objects2.connect(admin).safeMint(seller.address, 1, 0);
 
     await erc1155MockUp.connect(seller).mint(10);
     await erc1155MockUp.connect(seller2).mint(10);
@@ -151,8 +153,8 @@ describe("GFALMarketplace", function () {
       buyer,
       gfalToken,
       oracleConsumer,
-      items1,
-      items2,
+      objects1,
+      objects2,
       erc1155MockUp,
       gfalMarketplace,
       proxy,
@@ -196,21 +198,21 @@ describe("GFALMarketplace", function () {
     describe("Validations", function () {
       // SC PAUSED "isActive"
       it(`Update the contract Status to innactivated "UnderMaintenance" & try to buy listed item`, async function () {
-        const { seller, admin, buyer, gfalMarketplace, items1, gfalToken } =
+        const { seller, admin, buyer, gfalMarketplace, objects1, gfalToken } =
           await loadFixture(deployContracts);
 
         // List NFT
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
             false
           );
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
 
         await gfalMarketplace.connect(admin).updateContractStatus(false);
 
@@ -227,7 +229,7 @@ describe("GFALMarketplace", function () {
       });
 
       it(`Update the contract Status to innactivated "UnderMaintenance" & try to sell`, async function () {
-        const { seller, admin, gfalMarketplace, items1 } = await loadFixture(
+        const { seller, admin, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
@@ -238,7 +240,7 @@ describe("GFALMarketplace", function () {
           gfalMarketplace
             .connect(seller)
             .sellToken(
-              items1.address,
+              objects1.address,
               1,
               1,
               ethers.utils.parseUnits("50", "ether"),
@@ -246,11 +248,11 @@ describe("GFALMarketplace", function () {
             )
         ).to.be.revertedWith("MarketPlace Under maintenance");
 
-        expect(await items1.ownerOf(1)).to.not.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.not.equal(gfalMarketplace.address);
       });
 
       it(`Update the contract Status to innactivated "UnderMaintenance" & try to remove listed token. Should be allowed`, async function () {
-        const { seller, admin, gfalMarketplace, items1 } = await loadFixture(
+        const { seller, admin, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
@@ -258,24 +260,24 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
             false
           );
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
 
         await gfalMarketplace.connect(admin).updateContractStatus(false);
 
         expect(await gfalMarketplace.connect(seller).removeToken(0))
           .to.emit(gfalMarketplace, "RemoveToken")
-          .withArgs(items1.address, 1, seller.address);
+          .withArgs(objects1.address, 1, seller.address);
       });
 
       it(`Update the contract Status to innactivated "UnderMaintenance" by Owner`, async function () {
-        const { seller, admin, gfalMarketplace, items1 } = await loadFixture(
+        const { seller, admin, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
@@ -283,7 +285,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -305,7 +307,7 @@ describe("GFALMarketplace", function () {
 
       // Selling checks
       it("Test the contract's behavior when the token for sale is already sold and check that it works as expected", async function () {
-        const { seller, buyer, gfalToken, gfalMarketplace, items1 } =
+        const { seller, buyer, gfalToken, gfalMarketplace, objects1 } =
           await loadFixture(deployContracts);
 
         // Approve Token
@@ -319,7 +321,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -331,7 +333,7 @@ describe("GFALMarketplace", function () {
 
         await gfalMarketplace.connect(buyer).buyToken(0);
 
-        expect(await items1.ownerOf(1)).to.equal(buyer.address);
+        expect(await objects1.ownerOf(1)).to.equal(buyer.address);
 
         const saleAfter = await gfalMarketplace.Sales(0);
 
@@ -339,7 +341,7 @@ describe("GFALMarketplace", function () {
       });
 
       it("Test the contract's behavior when the price of a token is updated while it is being sold, and check that the buyer is charged the correct price", async function () {
-        const { seller, gfalMarketplace, items1 } = await loadFixture(
+        const { seller, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
@@ -347,27 +349,27 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
             false
           );
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
 
         // USD Price
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             2,
             1,
             ethers.utils.parseUnits("50", "ether"),
             true
           );
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
 
         const NFTsSale_1 = await gfalMarketplace.Sales(0);
 
@@ -391,7 +393,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("10", "ether"),
@@ -402,7 +404,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             2,
             1,
             ethers.utils.parseUnits("10", "ether"),
@@ -424,8 +426,8 @@ describe("GFALMarketplace", function () {
         );
       });
 
-      it("Get right amount of tokens Id on sale by seller on given dates items1", async function () {
-        const { admin, seller, gfalMarketplace, gfalToken, items1 } =
+      it("Get right amount of tokens Id on sale by seller on given dates objects1", async function () {
+        const { admin, seller, gfalMarketplace, gfalToken, objects1 } =
           await loadFixture(deployContracts);
 
         await gfalToken.transfer(
@@ -434,14 +436,14 @@ describe("GFALMarketplace", function () {
         );
         await gfalToken
           .connect(seller)
-          .approve(items1.address, ethers.utils.parseEther("1000"));
+          .approve(objects1.address, ethers.utils.parseEther("1000"));
 
         const balanceBefore = await gfalToken.balanceOf(seller.address);
 
-        await items1
+        await objects1
           .connect(admin)
           .safeMint(seller.address, 1, ethers.utils.parseEther("10"));
-        await items1
+        await objects1
           .connect(admin)
           .safeMint(seller.address, 1, ethers.utils.parseEther("10")); // 4 NFTs minted
 
@@ -453,7 +455,7 @@ describe("GFALMarketplace", function () {
           await gfalMarketplace
             .connect(seller)
             .sellToken(
-              items1.address,
+              objects1.address,
               i,
               1,
               ethers.utils.parseUnits("50", "ether"),
@@ -496,20 +498,20 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should revert if an user tries to sell a not-whitelistedNFT", async function () {
-        const { admin, seller, gfalMarketplace, items1 } = await loadFixture(
+        const { admin, seller, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
         // Adding ERC721 to whitelist as FALSE (BlackListed)
         await gfalMarketplace
           .connect(admin)
-          .updateCollection(items1.address, ERC721, false);
+          .updateCollection(objects1.address, ERC721, false);
 
         await expect(
           gfalMarketplace
             .connect(seller)
             .sellToken(
-              items1.address,
+              objects1.address,
               1,
               1,
               ethers.utils.parseUnits("50", "ether"),
@@ -519,14 +521,14 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should allow a seller to removeToken even if un-whitelisted", async function () {
-        const { admin, seller, gfalMarketplace, items1 } = await loadFixture(
+        const { admin, seller, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -536,20 +538,20 @@ describe("GFALMarketplace", function () {
         // Adding ERC721 to whitelist as FALSE (BlackListed)
         await gfalMarketplace
           .connect(admin)
-          .updateCollection(items1.address, ERC721, false);
+          .updateCollection(objects1.address, ERC721, false);
 
         // Remove Token un-whitelisted
         await gfalMarketplace.connect(seller).removeToken(0);
       });
 
       it("Should revert if an user tries to buy a not-whitelistedNFT (removed in the meantime)", async function () {
-        const { admin, buyer, seller, gfalMarketplace, gfalToken, items1 } =
+        const { admin, buyer, seller, gfalMarketplace, gfalToken, objects1 } =
           await loadFixture(deployContracts);
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -559,7 +561,7 @@ describe("GFALMarketplace", function () {
         // Adding ERC721 to whitelist as FALSE (BlackListed)
         await gfalMarketplace
           .connect(admin)
-          .updateCollection(items1.address, ERC721, false);
+          .updateCollection(objects1.address, ERC721, false);
 
         await gfalToken
           .connect(buyer)
@@ -570,17 +572,17 @@ describe("GFALMarketplace", function () {
 
         await expect(gfalMarketplace.connect(buyer).buyToken(0)).to.be.reverted;
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
       });
 
       it("Should revert if an user tries to buy an NFT which has been disapproved after listing", async function () {
-        const { buyer, seller, gfalMarketplace, gfalToken, items1 } =
+        const { buyer, seller, gfalMarketplace, gfalToken, objects1 } =
           await loadFixture(deployContracts);
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -601,14 +603,14 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should revert if an user tries to buy an NFT with balance but not approved", async function () {
-        const { buyer, seller, gfalMarketplace, items1 } = await loadFixture(
+        const { buyer, seller, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -618,7 +620,7 @@ describe("GFALMarketplace", function () {
         // Try to buy without GFAL token approval
         await expect(gfalMarketplace.connect(buyer).buyToken(0)).to.be.reverted;
 
-        expect(await items1.ownerOf(1)).to.equal(gfalMarketplace.address);
+        expect(await objects1.ownerOf(1)).to.equal(gfalMarketplace.address);
       });
 
       it("Should revert if an user tries to add a collection", async function () {
@@ -637,7 +639,7 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should revert if an user tries to remove a collection", async function () {
-        const { buyer, items1, gfalMarketplace } = await loadFixture(
+        const { buyer, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
@@ -645,7 +647,7 @@ describe("GFALMarketplace", function () {
         await expect(
           gfalMarketplace
             .connect(buyer)
-            .updateCollection(items1.address, ERC721, true)
+            .updateCollection(objects1.address, ERC721, true)
         ).to.be.reverted;
       });
 
@@ -691,12 +693,12 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should revert if invalid tokenStandard", async function () {
-        const { items1, items2, gfalMarketplace, erc1155MockUp, admin } =
+        const { objects1, objects2, gfalMarketplace, erc1155MockUp, admin } =
           await loadFixture(deployContracts);
 
         await gfalMarketplace
           .connect(admin)
-          .updateCollection(items1.address, 0, true);
+          .updateCollection(objects1.address, 0, true);
 
         await gfalMarketplace
           .connect(admin)
@@ -705,18 +707,18 @@ describe("GFALMarketplace", function () {
         await expect(
           gfalMarketplace
             .connect(admin)
-            .updateCollection(items2.address, 2, true)
+            .updateCollection(objects2.address, 2, true)
         ).to.be.reverted;
       });
 
       it("Should increment saleID after each sale", async function () {
-        const { seller, items1, gfalMarketplace, erc1155MockUp } =
+        const { seller, objects1, gfalMarketplace, erc1155MockUp } =
           await loadFixture(deployContracts);
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -726,7 +728,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             2,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -749,7 +751,7 @@ describe("GFALMarketplace", function () {
 
     describe("Events", function () {
       it("Should emit an event SellToken on put for sell a token", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
@@ -757,7 +759,7 @@ describe("GFALMarketplace", function () {
           await gfalMarketplace
             .connect(seller)
             .sellToken(
-              items1.address,
+              objects1.address,
               1,
               1,
               ethers.utils.parseUnits("50", "ether"),
@@ -766,7 +768,7 @@ describe("GFALMarketplace", function () {
         )
           .to.emit(gfalMarketplace, "SellToken")
           .withArgs(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -777,14 +779,14 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should emit an event RemoveToken on remove from sell a token", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -800,17 +802,17 @@ describe("GFALMarketplace", function () {
         // Removes it
         await expect(await gfalMarketplace.connect(seller).removeToken(0))
           .to.emit(gfalMarketplace, "RemoveToken")
-          .withArgs(items1.address, 1, seller.address, 0);
+          .withArgs(objects1.address, 1, seller.address, 0);
       });
 
       it("Should emit an event BuyToken buying a token ERC721", async function () {
-        const { seller, buyer, items1, gfalToken, gfalMarketplace } =
+        const { seller, buyer, objects1, gfalToken, gfalMarketplace } =
           await loadFixture(deployContracts);
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -835,7 +837,7 @@ describe("GFALMarketplace", function () {
         await expect(await gfalMarketplace.connect(buyer).buyToken(0))
           .to.emit(gfalMarketplace, "BuyToken")
           .withArgs(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -846,13 +848,13 @@ describe("GFALMarketplace", function () {
             0
           );
 
-        expect(await items1.ownerOf(1)).to.equal(buyer.address);
+        expect(await objects1.ownerOf(1)).to.equal(buyer.address);
       });
     });
 
     describe("Transfers", function () {
       it("Should put a whitelisted collection token for sell in $GFAL", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
@@ -860,7 +862,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -875,7 +877,7 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should put a whitelisted collection token for sell in Dollars", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
@@ -883,7 +885,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("5", "ether"),
@@ -898,14 +900,14 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should adjust the price for a token already for sell", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -923,7 +925,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("100", "ether"),
@@ -938,14 +940,14 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should remove a token from sell", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -969,13 +971,13 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should put on sale a token ERC721 and modify the price", async function () {
-        const { seller, items1, gfalMarketplace } = await loadFixture(
+        const { seller, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
         await gfalMarketplace
           .connect(seller)
-          .sellToken(items1.address, 1, 1, 100, false);
+          .sellToken(objects1.address, 1, 1, 100, false);
 
         const sale = await gfalMarketplace.Sales(0);
 
@@ -991,7 +993,7 @@ describe("GFALMarketplace", function () {
       });
 
       it("Should buy a token ERC721 that is for sell in $GFAL", async function () {
-        const { seller, buyer, items1, gfalToken, gfalMarketplace, proxy } =
+        const { seller, buyer, objects1, gfalToken, gfalMarketplace, proxy } =
           await loadFixture(deployContracts);
         const sellerBalanceBefore = await gfalToken.balanceOf(seller.address);
         const buyerBalanceBefore = await gfalToken.balanceOf(buyer.address);
@@ -1001,7 +1003,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("50", "ether"),
@@ -1023,16 +1025,16 @@ describe("GFALMarketplace", function () {
           );
 
         // NFT balance
-        expect(await items1.balanceOf(seller.address)).to.equal(1);
-        expect(await items1.balanceOf(gfalMarketplace.address)).to.equal(1);
-        expect(await items1.balanceOf(buyer.address)).to.equal(0);
+        expect(await objects1.balanceOf(seller.address)).to.equal(1);
+        expect(await objects1.balanceOf(gfalMarketplace.address)).to.equal(1);
+        expect(await objects1.balanceOf(buyer.address)).to.equal(0);
 
         // Buyer buys NFTs from seller
         await gfalMarketplace.connect(buyer).buyToken(0);
 
         // NFT balance
-        expect(await items1.balanceOf(seller.address)).to.equal(1);
-        expect(await items1.balanceOf(buyer.address)).to.equal(1);
+        expect(await objects1.balanceOf(seller.address)).to.equal(1);
+        expect(await objects1.balanceOf(buyer.address)).to.equal(1);
 
         const sellerBalanceAfter = await gfalToken.balanceOf(seller.address);
         const buyerBalanceAfter = await gfalToken.balanceOf(buyer.address);
@@ -1052,7 +1054,7 @@ describe("GFALMarketplace", function () {
         expect(tokensForSale.isForSale).to.equal(false);
       });
       it("Should buy a token ERC721 that is for sell in Dollars", async function () {
-        const { seller, buyer, items1, gfalToken, proxy, gfalMarketplace } =
+        const { seller, buyer, objects1, gfalToken, proxy, gfalMarketplace } =
           await loadFixture(deployContracts);
 
         const sellerBalanceBefore = await gfalToken.balanceOf(seller.address);
@@ -1062,7 +1064,7 @@ describe("GFALMarketplace", function () {
         await gfalMarketplace
           .connect(seller)
           .sellToken(
-            items1.address,
+            objects1.address,
             1,
             1,
             ethers.utils.parseUnits("5", "ether"),
@@ -1084,16 +1086,16 @@ describe("GFALMarketplace", function () {
           );
 
         // NFT balance
-        expect(await items1.balanceOf(seller.address)).to.equal(1);
-        expect(await items1.balanceOf(gfalMarketplace.address)).to.equal(1);
-        expect(await items1.balanceOf(buyer.address)).to.equal(0);
+        expect(await objects1.balanceOf(seller.address)).to.equal(1);
+        expect(await objects1.balanceOf(gfalMarketplace.address)).to.equal(1);
+        expect(await objects1.balanceOf(buyer.address)).to.equal(0);
 
         // Buyer buys NFTs from seller
         await gfalMarketplace.connect(buyer).buyToken(0);
 
         // NFT balance
-        expect(await items1.balanceOf(seller.address)).to.equal(1);
-        expect(await items1.balanceOf(buyer.address)).to.equal(1);
+        expect(await objects1.balanceOf(seller.address)).to.equal(1);
+        expect(await objects1.balanceOf(buyer.address)).to.equal(1);
 
         const sellerBalanceAfter = await gfalToken.balanceOf(seller.address);
         const buyerBalanceAfter = await gfalToken.balanceOf(buyer.address);
@@ -1395,21 +1397,21 @@ describe("GFALMarketplace", function () {
       });
 
       it("Owner should be able to remove a collection", async function () {
-        const { admin, items1, gfalMarketplace } = await loadFixture(
+        const { admin, objects1, gfalMarketplace } = await loadFixture(
           deployContracts
         );
 
         // Owner addCollection
         await gfalMarketplace
           .connect(admin)
-          .updateCollection(items1.address, ERC721, false);
+          .updateCollection(objects1.address, ERC721, false);
 
         // Expect to find it in the mapping as true
         expect(
-          (await gfalMarketplace.whitelistNFTs(items1.address)).tokenStandard
+          (await gfalMarketplace.whitelistNFTs(objects1.address)).tokenStandard
         ).to.equal(0);
         expect(
-          (await gfalMarketplace.whitelistNFTs(items1.address)).allowed
+          (await gfalMarketplace.whitelistNFTs(objects1.address)).allowed
         ).to.equal(false);
       });
 
@@ -1616,20 +1618,20 @@ describe("GFALMarketplace", function () {
 
     describe("testing", function () {
       it("Testing price gas", async () => {
-        const { admin, gfalMarketplace, items1 } = await loadFixture(
+        const { admin, gfalMarketplace, objects1 } = await loadFixture(
           deployContracts
         );
 
-        await items1.createCollection(101);
+        await objects1.createCollection(101);
 
         for (let i = 0; i < 100; i++) {
-          await items1.connect(admin).safeMint(admin.address, 2, 0);
+          await objects1.connect(admin).safeMint(admin.address, 2, 0);
         }
 
         for (let i = 3; i < 103; i++) {
           await gfalMarketplace
             .connect(admin)
-            .sellToken(items1.address, i, 1, 1, false);
+            .sellToken(objects1.address, i, 1, 1, false);
         }
       });
     });
