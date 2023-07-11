@@ -11,23 +11,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../../utils/OracleConsumer/IGFALOracleConsumer.sol";
 import "../../utils/Proxy/IGFALProxy.sol";
 
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@#################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@#########        #########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  #####          (###########@@@@@@@@          @@@           @     @@@@@    @@@@@@
-  ###        ########   (####@@@@@@    @@@@@@   @@    @@@@@@@   @   @@@@    @@@@@@
-  ###     ##(((((%%     /####@@@@@    @@@@@                @   @@@   @@@    @@@@@@
-  ###     #####%%%#     /####@@@@@    @@@@####   (    @@@@@   @@@@@   @@    @@@@@@
-  ###      #######      /####@@@@@@@     @@     @@    @@@@             @    @@@@@@
-  %%%%#               *#%%%%#@@@@@@@@@@      @@@@@    @@@    @@@@@@@   ,        @@
-  #########       #########(@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@########(((#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@#########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                                                        GFAL - GAMES FOR A LIVING
-*/
 /**
- *@title GFALMarketplace
+ *@title GFAL Marketplace - GAMES FOR A LIVING
  *@dev GFAL Marketplace is a smart contract where users can sell and buy ERC721 and ERC1155 tokens.
  * It uses OpenZeppelin contracts as libraries and inherits from ReentrancyGuard to prevent reentrancy attacks.
  * Note: Constructor and functions that need gas fee are set as payable to avoid OPCODES checking msg.value.

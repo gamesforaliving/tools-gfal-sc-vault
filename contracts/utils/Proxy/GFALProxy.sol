@@ -3,23 +3,8 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@#################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@#########        #########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  #####          (###########@@@@@@@@          @@@           @     @@@@@    @@@@@@
-  ###        ########   (####@@@@@@    @@@@@@   @@    @@@@@@@   @   @@@@    @@@@@@
-  ###     ##(((((%%     /####@@@@@    @@@@@                @   @@@   @@@    @@@@@@
-  ###     #####%%%#     /####@@@@@    @@@@####   (    @@@@@   @@@@@   @@    @@@@@@
-  ###      #######      /####@@@@@@@     @@     @@    @@@@             @    @@@@@@
-  %%%%#               *#%%%%#@@@@@@@@@@      @@@@@    @@@    @@@@@@@   ,        @@
-  #########       #########(@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@########(((#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@#########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                                                        GFAL - GAMES FOR A LIVING
-*/
 /**
- * @title GFALProxy
+ * @title GFAL Proxy - GAMES FOR A LIVING
  * @dev This contract designed to facilitate the integration of multiple ERC20, ERC721, and ERC1155 tokens into a unified ecosystem.
  * The contract provides an interface to verify addresses as token address, fee collector address, royalties collector address, admin addresses,
  * super admin addresses and owner address to interact with the underlying protocol, and the associated marketplace.

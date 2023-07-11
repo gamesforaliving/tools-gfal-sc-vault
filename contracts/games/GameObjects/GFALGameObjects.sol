@@ -9,23 +9,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "../../utils/OracleConsumer/IGFALOracleConsumer.sol";
 import "../../utils/Proxy/IGFALProxy.sol";
 
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@#################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@#########        #########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  #####          (###########@@@@@@@@          @@@           @     @@@@@    @@@@@@
-  ###        ########   (####@@@@@@    @@@@@@   @@    @@@@@@@   @   @@@@    @@@@@@
-  ###     ##(((((%%     /####@@@@@    @@@@@                @   @@@   @@@    @@@@@@
-  ###     #####%%%#     /####@@@@@    @@@@####   (    @@@@@   @@@@@   @@    @@@@@@
-  ###      #######      /####@@@@@@@     @@     @@    @@@@             @    @@@@@@
-  %%%%#               *#%%%%#@@@@@@@@@@      @@@@@    @@@    @@@@@@@   ,        @@
-  #########       #########(@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@########(((#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@@@@@@@#########@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                                                        GFAL - GAMES FOR A LIVING
-*/
 /**
- * @title GFAL Game Objects
+ * @title GFAL Game Objects - GAMES FOR A LIVING
  * @dev This contract represents an ERC721 token for GFAL (Games for a living) game Items. It uses SafeERC20 to transfer GFAL tokens and OracleConsumer to fetch GFAL price conversion rates.
  * The contract allows the game to safely mint tokens by ensuring that users have approved the required amount of GFAL tokens before minting & allowes the Marketplace SC to manage all NFTs.
  * The contract also allows the game owner to update minting prices and the base URI.
