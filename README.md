@@ -1,3 +1,5 @@
+> Operational signing now uses encrypted Foundry keystores. Follow [KEYSTORE_MIGRATION.md](KEYSTORE_MIGRATION.md); older raw private key environment instructions below are superseded.
+
 ![cropped-isotype2-uai-120x120](https://github.com/gamesforaliving/web3/assets/130460979/384b0565-c9ae-4510-979c-2ee2b0aad9dc)
 # Games for a Living (GFAL) Web3 Smart Contract Vault
 
