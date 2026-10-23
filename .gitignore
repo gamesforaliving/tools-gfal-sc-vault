@@ -12,3 +12,8 @@ artifacts
 .idea
 .vscode
 gas-report.txt
+# Local signing credentials
+.env
+.env.local
+.env.*.local
+.foundry/
